@@ -28,13 +28,6 @@ ENV PATH="/usr/bin/python3.12:$PATH"
 # Create symbolic links for python3 and pip3
 RUN ln -sf /usr/bin/python3.12 /usr/bin/python && \
     ln -sf /usr/bin/pip3 /usr/bin/pip
-RUN git clone https://github.com/comfyanonymous/ComfyUI
-
-# Change working directory to ComfyUI
-WORKDIR /ComfyUI
-
-# Support for the network volume
-ADD src/extra_model_paths.yaml ./
 
 # Go back to the root
 WORKDIR /
