@@ -8,6 +8,8 @@ comfyui:
   controlnet: models/controlnet/
   diffusers: models/diffusers/
   diffusion_models: models/diffusion_models/
+  text_encoders: models/text_encoders/
+  style_models: models/style_models/
   gligen: models/gligen/
   hypernetworks: models/hypernetworks/
   model_patches: models/model_patches/
