@@ -18,10 +18,9 @@ services:
       - "8001:8001"
     volumes:
       - ./models-mapping:/runpod-volume
-      - .:/workspace
 
     command: >
-      /bin/bash -c "app-dev-test/start_dev.sh"
+      /bin/bash -c "/app-dev-test/start_dev.sh"
 
     # command: tail -f /dev/null
     # command: >
