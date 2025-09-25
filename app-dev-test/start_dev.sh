@@ -9,18 +9,29 @@ echo "Starting ComfyUI server..."
 /workspace/.venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch &
 COMFYUI_PID=$!
 
-# Chờ ComfyUI khởi động
+# Chờ ComfyUI khởi động và kiểm tra health check
 echo "Waiting for ComfyUI to start..."
-sleep 60
+MAX_ATTEMPTS=10
+ATTEMPT=1
+SLEEP_INTERVAL=30
 
-# Kiểm tra ComfyUI có chạy không
-echo "Checking ComfyUI health..."
-if ! curl -f http://localhost:8188/system_stats > /dev/null 2>&1; then
-    echo "ComfyUI failed to start"
-    exit 1
-fi
-
-echo "ComfyUI started successfully on port 8188"
+while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+    echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
+    
+    if curl -f http://localhost:8188/system_stats > /dev/null 2>&1; then
+        echo "ComfyUI started successfully on port 8188"
+        break
+    fi
+    
+    if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+        echo "ComfyUI failed to start after $MAX_ATTEMPTS attempts"
+        exit 1
+    fi
+    
+    echo "ComfyUI not ready yet, waiting $SLEEP_INTERVAL seconds..."
+    sleep $SLEEP_INTERVAL
+    ATTEMPT=$((ATTEMPT + 1))
+done
 
 # Start Worker Server (port 8001) - sử dụng uv venv
 echo "Starting Worker Server on port 8001..."
