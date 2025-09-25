@@ -46,7 +46,7 @@ COPY ./dev/ /dev
 COPY ./workflow-data/ /workflow-data
 
 # Install Python dependencies cho dev programs
-RUN uv pip install aiohttp>=3.8.0 requests>=2.28.0 Pillow>=9.0.0 ujson>=5.0.0 colorlog>=6.7.0
+RUN uv pip install "aiohttp>=3.8.0" "requests>=2.28.0" "Pillow>=9.0.0" "ujson>=5.0.0" "colorlog>=6.7.0"
 
 # Expose ports
 EXPOSE 8188 8000 8001
