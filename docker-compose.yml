@@ -15,9 +15,13 @@ services:
     ports:
       - "8188:8188"
       - "8000:8000"
+      - "8001:8001"
     volumes:
       - .:/workspace
 
-    # command: tail -f /dev/null
     command: >
-      /bin/bash -c "/workspace/.venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch"
+      /bin/bash -c "dev/start_dev.sh"
+
+    # command: tail -f /dev/null
+    # command: >
+    #   /bin/bash -c "/workspace/.venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch"
