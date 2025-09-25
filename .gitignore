@@ -1,0 +1,101 @@
+# .gitignore for ComfyUI serverless / RunPod projects
+
+### Virtual envs / Python artifacts
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+__pycache__/
+*.py[cod]
+*$py.class
+
+### Distribution / build
+build/
+dist/
+eggs/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+*.whl
+
+### Packaging / dependency managers
+.venv/
+poetry.lock
+Pipfile.lock
+
+### IDE / editor folders
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.iml
+
+### OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Logs, databases, caches
+*.log
+*.sqlite3
+*.db
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+.nox/
+
+### Jupyter
+.ipynb_checkpoints/
+
+### Docker / sockets / pid files
+*.pid
+*.sock
+docker-compose.override.yml
+/.docker/
+
+### ComfyUI specific
+ComfyUI/
+
+### Models, large data and artifacts
+models/
+model_weights/
+*.ckpt
+*.safetensors
+*.pth
+*.pt
+*.bin
+*.onnx
+*.h5
+
+### RunPod / serverless specific
+runpod_config.json
+runpod_secrets.json
+runpod_temp/
+
+### Secrets and environment files
+.env
+*.env
+.env.local
+.env.*.local
+.envrc
+.python-version
+
+### Editor swap / temp files
+*~
+*.swp
+*.swo
+*.tmp
+*.bak
+
+### Misc
+coverage.xml
+reports/
+notes/
+
+# End of .gitignore

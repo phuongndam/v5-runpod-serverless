@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "ComfyUI Serverless Test API",
+    "description": "Postman collection để test ComfyUI Serverless Handler (mô phỏng RunPod)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Get Workflow Template",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/workflow/template",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["workflow", "template"]
+        }
+      }
+    },
+    {
+      "name": "Run Sync Handler",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"workflow\": {\n    \"nodes\": [],\n    \"links\": []\n  },\n  \"input\": {\n    \"text\": \"test prompt for sync handler\",\n    \"seed\": 12345\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/runsync",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["runsync"]
+        }
+      }
+    },
+    {
+      "name": "Run Async Handler",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"workflow\": {\n    \"nodes\": [],\n    \"links\": []\n  },\n  \"input\": {\n    \"text\": \"test prompt for async handler\",\n    \"seed\": 54321\n  }\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/runasync",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["runasync"]
+        }
+      }
+    },
+    {
+      "name": "Text2Image - Basic",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"magazine cover photo of a black supermodel, full body shot, low angle view from her feet, wide-angle lens, watching the sunset, hyperrealistic, vogue style\",\n  \"width\": 832,\n  \"height\": 1280,\n  \"steps\": 8,\n  \"cfg\": 1.0,\n  \"batch_size\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/text2image",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["text2image"]
+        }
+      }
+    },
+    {
+      "name": "Text2Image - Custom Seed",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"a beautiful landscape with mountains and lake, sunset, photorealistic\",\n  \"width\": 1024,\n  \"height\": 1024,\n  \"steps\": 12,\n  \"cfg\": 1.5,\n  \"seed\": 12345,\n  \"batch_size\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/text2image",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["text2image"]
+        }
+      }
+    },
+    {
+      "name": "Test Sync Handler",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/test/sync",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["test", "sync"]
+        }
+      }
+    },
+    {
+      "name": "Test Async Handler",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/test/async",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["test", "async"]
+        }
+      }
+    }
+  ]
+}
