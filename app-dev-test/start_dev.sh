@@ -11,26 +11,28 @@ COMFYUI_PID=$!
 
 # Chờ ComfyUI khởi động và kiểm tra health check
 echo "Waiting for ComfyUI to start..."
-MAX_ATTEMPTS=10
-ATTEMPT=1
-SLEEP_INTERVAL=30
 
-while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
-    echo "Health check attempt $ATTEMPT/$MAX_ATTEMPTS..."
+counter=0
+while [ $counter -le 19 ]; do
+    echo "Health check attempt $counter..."
     
-    if curl -f http://localhost:8188/system_stats > /dev/null 2>&1; then
-        echo "ComfyUI started successfully on port 8188"
-        break
+    # Check if ComfyUI process is running and port is listening
+    if ps aux | grep "main.py" | grep -v grep > /dev/null && netstat -tlnp 2>/dev/null | grep 8188 > /dev/null; then
+        # Additional check: try to get a response from ComfyUI
+        if curl -s http://localhost:8188/system_stats > /dev/null 2>&1; then
+            echo "ComfyUI started successfully on port 8188"
+            break
+        fi
     fi
     
-    if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-        echo "ComfyUI failed to start after $MAX_ATTEMPTS attempts"
+    if [ $counter -eq 19 ]; then
+        echo "ComfyUI failed to start after 20 attempts"
         exit 1
     fi
     
-    echo "ComfyUI not ready yet, waiting $SLEEP_INTERVAL seconds..."
-    sleep $SLEEP_INTERVAL
-    ATTEMPT=$((ATTEMPT + 1))
+    echo "ComfyUI not ready yet, waiting 20 seconds..."
+    sleep 20
+    counter=$((counter + 1))
 done
 
 # Start Worker Server (port 8001) - sử dụng uv venv
@@ -41,7 +43,7 @@ WORKER_PID=$!
 
 # Chờ worker server khởi động
 echo "Waiting for Worker Server to start..."
-sleep 5
+sleep 20
 
 # Start API Server (port 8000) - sử dụng uv venv
 echo "Starting API Server on port 8000..."
