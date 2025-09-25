@@ -4,9 +4,9 @@
 
 echo "Starting ComfyUI Serverless Development..."
 
-# Start ComfyUI server trong background (sử dụng venv đã cài sẵn)
+# Start ComfyUI server trong background (sử dụng venv từ Docker image)
 echo "Starting ComfyUI server..."
-/workspace/.venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch &
+/environment-comfyui/venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch &
 COMFYUI_PID=$!
 
 # Chờ ComfyUI khởi động và kiểm tra health check

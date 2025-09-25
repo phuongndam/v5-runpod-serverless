@@ -15,7 +15,7 @@ ComfyUI (port 8188)
 ## Cài đặt dependencies
 
 ### 1. Cài đặt cho Docker container
-- **ComfyUI**: Chạy với `/workspace/.venv/bin/python` (dependencies đã cài sẵn)
+- **ComfyUI**: Chạy với `/environment-comfyui/venv/bin/python` (dependencies từ Docker image)
 - **Dev programs**: Chạy với uv virtual environment `/opt/dev-venv/bin/python` với dependencies từ `/dev/requirements-dev.txt`
 
 ### 2. Cài đặt cho development local (Windows) - Tùy chọn

@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: v5runpod-comfyuiworker:v1.0.0
+    image: phuongndam/comfyuiworker:v1.0.0
     pull_policy: never
     deploy:
       resources:
@@ -17,6 +17,7 @@ services:
       - "8000:8000"
       - "8001:8001"
     volumes:
+      - ./models-mapping:/runpod-volume
       - .:/workspace
 
     # command: >

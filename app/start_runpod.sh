@@ -5,7 +5,7 @@
 echo "Starting ComfyUI Serverless on RunPod..."
 
 # Activate virtual environment
-source /workspace/.venv/bin/activate
+source /environment-comfyui/venv/bin/activate
 
 # Start ComfyUI server trong background
 cd /workspace/ComfyUI

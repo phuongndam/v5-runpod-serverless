@@ -28,8 +28,15 @@ ENV PATH="/usr/bin/python3.12:$PATH"
 # Create symbolic links for python3 and pip3
 RUN ln -sf /usr/bin/python3.12 /usr/bin/python && \
     ln -sf /usr/bin/pip3 /usr/bin/pip
+RUN git clone https://github.com/comfyanonymous/ComfyUI
 
-# Set the working directory
+# Change working directory to ComfyUI
+WORKDIR /ComfyUI
+
+# Support for the network volume
+ADD src/extra_model_paths.yaml ./
+
+# Go back to the root
 WORKDIR /
 
 # Install uv (latest) using official installer and create isolated venv
@@ -41,14 +48,33 @@ RUN wget -qO- https://astral.sh/uv/install.sh | sh \
 # Use the virtual environment for all subsequent commands
 ENV PATH="/opt/dev-venv/bin:${PATH}"
 
+# Install Python runtime dependencies for the handler
+RUN uv pip install runpod requests websocket-client
+
 # Copy files after setting up the environment
 COPY ./app-dev-test/ /app-dev-test
 COPY ./workflow-data/ /workflow-data
+COPY ./ComfyUI/ /ComfyUI
+
+# Change working directory to ComfyUI
+WORKDIR /ComfyUI
+ADD src/extra_model_paths.yaml ./
+
+RUN chmod -R 755 /app-dev-test
+RUN chmod -R 755 /workflow-data
+RUN chmod -R 755 /ComfyUI
+
+# Copy và giải nén venv trực tiếp
+COPY venv.tar.gz /tmp/venv.tar.gz
+RUN mkdir -p /environment-comfyui/venv \
+    && tar -xzf /tmp/venv.tar.gz -C /environment-comfyui/venv \
+    && rm /tmp/venv.tar.gz \
+    && chmod -R 755 /environment-comfyui/venv
 
 # Install Python dependencies cho dev programs
 RUN uv pip install "aiohttp>=3.8.0" "requests>=2.28.0" "Pillow>=9.0.0" "ujson>=5.0.0" "colorlog>=6.7.0"
 
-# Expose ports
+# Expose ports  
 EXPOSE 8188 8000 8001
 
 CMD ["/bin/bash"]
