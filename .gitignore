@@ -74,5 +74,6 @@ notes/
 ### Venv and models-mapping
 venv.tar.gz
 models-mapping/
+ComfyUI/
 
 # End of .gitignore

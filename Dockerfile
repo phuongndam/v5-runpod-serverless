@@ -54,11 +54,18 @@ RUN uv pip install runpod requests websocket-client
 # Copy files after setting up the environment
 COPY ./app-dev-test/ /app-dev-test
 COPY ./workflow-data/ /workflow-data
-COPY ./ComfyUI/ /ComfyUI
 
-# Change working directory to ComfyUI
-WORKDIR /ComfyUI
-ADD src/extra_model_paths.yaml ./
+# root directory
+WORKDIR /
+
+# clone ComfyUI in root directory
+RUN git clone https://github.com/comfyanonymous/ComfyUI
+
+# copy custom nodes to ComfyUI directory in Docker container
+COPY ComfyUI/custom_nodes/ /ComfyUI/custom_nodes
+
+# copy extra model paths to ComfyUI directory in Docker container
+COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
 
 RUN chmod -R 755 /app-dev-test
 RUN chmod -R 755 /workflow-data

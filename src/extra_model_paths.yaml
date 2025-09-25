@@ -1,5 +1,6 @@
-runpod_worker_comfy:
+comfyui:
   base_path: /runpod-volume
+  is_default: true
   checkpoints: models/checkpoints/
   clip: models/clip/
   clip_vision: models/clip_vision/
@@ -9,7 +10,6 @@ runpod_worker_comfy:
   diffusion_models: models/diffusion_models/
   gligen: models/gligen/
   hypernetworks: models/hypernetworks/
-  lora: models/lora/
   model_patches: models/model_patches/
   photomaker: models/photomaker/
   embeddings: models/embeddings/
@@ -18,4 +18,3 @@ runpod_worker_comfy:
   vae: models/vae/
   unet: models/unet/
   vae_approx: models/vae_approx/
-  t2i_adapter: models/t2i_adapter/

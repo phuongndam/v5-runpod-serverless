@@ -6,34 +6,28 @@ echo "Starting ComfyUI Serverless Development..."
 
 # Start ComfyUI server trong background (sử dụng venv từ Docker image)
 echo "Starting ComfyUI server..."
-/environment-comfyui/venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch &
+/environment-comfyui/venv/bin/python /ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch &
 COMFYUI_PID=$!
 
-# Chờ ComfyUI khởi động và kiểm tra health check
+# Chờ ComfyUI khởi động
 echo "Waiting for ComfyUI to start..."
+sleep 30
 
-counter=0
-while [ $counter -le 19 ]; do
-    echo "Health check attempt $counter..."
-    
-    # Check if ComfyUI process is running and port is listening
-    if ps aux | grep "main.py" | grep -v grep > /dev/null && netstat -tlnp 2>/dev/null | grep 8188 > /dev/null; then
-        # Additional check: try to get a response from ComfyUI
-        if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8188/system_stats/ | grep -q 200; then
-            echo "ComfyUI started successfully on port 8188"
-            break
-        fi
-    fi
-    
-    if [ $counter -eq 19 ]; then
-        echo "ComfyUI failed to start after 20 attempts"
-        exit 1
-    fi
-    
-    echo "ComfyUI not ready yet, waiting 20 seconds..."
-    sleep 20
-    counter=$((counter + 1))
-done
+# Kiểm tra đơn giản xem ComfyUI process có đang chạy không
+if ps aux | grep "main.py" | grep -v grep > /dev/null; then
+    echo "ComfyUI process is running"
+else
+    echo "ComfyUI process not found"
+    exit 1
+fi
+
+# Kiểm tra port có đang listen không
+if netstat -tlnp 2>/dev/null | grep 8188 > /dev/null; then
+    echo "ComfyUI is listening on port 8188"
+else
+    echo "ComfyUI is not listening on port 8188"
+    exit 1
+fi
 
 # Start Worker Server (port 8001) - sử dụng uv venv
 echo "Starting Worker Server on port 8001..."
