@@ -24,7 +24,7 @@ echo "ComfyUI started successfully on port 8188"
 
 # Start Worker Server (port 8001) - sử dụng uv venv
 echo "Starting Worker Server on port 8001..."
-cd /dev
+cd /app-dev-test
 /opt/dev-venv/bin/python worker_server.py &
 WORKER_PID=$!
 
@@ -34,7 +34,7 @@ sleep 5
 
 # Start API Server (port 8000) - sử dụng uv venv
 echo "Starting API Server on port 8000..."
-cd /dev
+cd /app-dev-test
 /opt/dev-venv/bin/python api_server.py &
 API_PID=$!
 

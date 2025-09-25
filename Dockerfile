@@ -42,7 +42,7 @@ RUN wget -qO- https://astral.sh/uv/install.sh | sh \
 ENV PATH="/opt/dev-venv/bin:${PATH}"
 
 # Copy files after setting up the environment
-COPY ./dev/ /dev
+COPY ./app-dev-test/ /app-dev-test
 COPY ./workflow-data/ /workflow-data
 
 # Install Python dependencies cho dev programs
