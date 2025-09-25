@@ -19,7 +19,7 @@ while [ $counter -le 19 ]; do
     # Check if ComfyUI process is running and port is listening
     if ps aux | grep "main.py" | grep -v grep > /dev/null && netstat -tlnp 2>/dev/null | grep 8188 > /dev/null; then
         # Additional check: try to get a response from ComfyUI
-        if curl -s http://localhost:8188/system_stats > /dev/null 2>&1; then
+        if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8188/system_stats/ | grep -q 200; then
             echo "ComfyUI started successfully on port 8188"
             break
         fi
