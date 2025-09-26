@@ -44,8 +44,12 @@ ENV PATH="/opt/dev-venv/bin:${PATH}"
 # Install Python runtime dependencies for the handler
 RUN uv pip install runpod requests websocket-client
 
+COPY ./requirements.txt /tmp/requirements.txt
+RUN uv pip install -r /tmp/requirements.txt
+RUN rm /tmp/requirements.txt
+
 # Copy files after setting up the environment
-COPY ./app-dev-test/ /app-dev-test
+COPY ./app/ /app
 COPY ./workflow-data/ /workflow-data
 
 # root directory
@@ -60,7 +64,7 @@ COPY ComfyUI/custom_nodes/ /ComfyUI/custom_nodes
 # copy extra model paths to ComfyUI directory in Docker container
 COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
 
-RUN chmod -R 755 /app-dev-test
+RUN chmod -R 755 /app
 RUN chmod -R 755 /workflow-data
 RUN chmod -R 755 /ComfyUI
 
@@ -74,7 +78,4 @@ RUN mkdir -p /environment-comfyui/venv \
 # Install Python dependencies cho dev programs
 RUN uv pip install "aiohttp>=3.8.0" "requests>=2.28.0" "Pillow>=9.0.0" "ujson>=5.0.0" "colorlog>=6.7.0"
 
-# Expose ports  
-EXPOSE 8188 8000 8001
-
-CMD ["/bin/bash"]
+CMD ["app/start.sh"]

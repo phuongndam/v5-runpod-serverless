@@ -76,4 +76,8 @@ venv.tar.gz
 models-mapping/
 ComfyUI/
 
+### Local development folders
+app-dev-test/
+test-api-dev-local/
+
 # End of .gitignore

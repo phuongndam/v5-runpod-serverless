@@ -1,8 +1,5 @@
 services:
   comfyui-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: phuongndam/comfyuiworker:v1.0.0
     pull_policy: never
     deploy:
@@ -19,8 +16,8 @@ services:
     volumes:
       - ./models-mapping:/runpod-volume
 
-    command: >
-      /bin/bash -c "/app-dev-test/start_dev.sh"
+    # command: >
+    #   /bin/bash -c "/app-dev-test/start_dev.sh"
 
     # command: tail -f /dev/null
     # command: >

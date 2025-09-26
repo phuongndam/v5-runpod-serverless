@@ -1,0 +1,5 @@
+runpod
+websocket-client
+requests
+fastapi
+uvicorn
