@@ -41,9 +41,6 @@ RUN wget -qO- https://astral.sh/uv/install.sh | sh \
 # Use the virtual environment for all subsequent commands
 ENV PATH="/opt/dev-venv/bin:${PATH}"
 
-# Install Python runtime dependencies for the handler
-RUN uv pip install runpod requests websocket-client
-
 COPY ./requirements.txt /tmp/requirements.txt
 RUN uv pip install -r /tmp/requirements.txt
 RUN rm /tmp/requirements.txt
@@ -74,8 +71,5 @@ RUN mkdir -p /environment-comfyui/venv \
     && tar -xzf /tmp/venv.tar.gz -C /environment-comfyui/venv \
     && rm /tmp/venv.tar.gz \
     && chmod -R 755 /environment-comfyui/venv
-
-# Install Python dependencies cho dev programs
-RUN uv pip install "aiohttp>=3.8.0" "requests>=2.28.0" "Pillow>=9.0.0" "ujson>=5.0.0" "colorlog>=6.7.0"
 
 CMD ["app/start.sh"]
