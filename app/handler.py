@@ -286,8 +286,8 @@ def health_monitor_loop():
             # Perform health check
             health_result = health_checker.check_health()
             
-            # Send heartbeat to load balancer
-            asyncio.create_task(send_heartbeat(health_result))
+            # Send heartbeat to load balancer (synchronous version)
+            send_heartbeat_sync(health_result)
             
             # Check if restart is needed
             if health_checker.should_restart():
@@ -303,8 +303,29 @@ def health_monitor_loop():
         
         time.sleep(5)  # Check every 5 seconds
 
+def send_heartbeat_sync(health_result):
+    """Send heartbeat to load balancer (synchronous version)"""
+    try:
+        load_balancer_url = os.getenv("LOAD_BALANCER_URL", "http://localhost:8000")
+        cpu_usage = psutil.cpu_percent()
+        
+        response = requests.post(
+            f"{load_balancer_url}/worker_heartbeat",
+            params={
+                "worker_id": worker_id,
+                "cpu_usage": cpu_usage
+            },
+            timeout=5
+        )
+        
+        if response.status_code != 200:
+            logger.warning(f"Heartbeat failed: {response.status_code}")
+            
+    except Exception as e:
+        logger.warning(f"Could not send heartbeat: {e}")
+
 async def send_heartbeat(health_result):
-    """Send heartbeat to load balancer"""
+    """Send heartbeat to load balancer (async version)"""
     try:
         load_balancer_url = os.getenv("LOAD_BALANCER_URL", "http://localhost:8000")
         cpu_usage = psutil.cpu_percent()
