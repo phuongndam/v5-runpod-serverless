@@ -1,6 +1,6 @@
 services:
   comfyui-worker:
-    image: phuongndam/comfyuiworker:v1.0.3
+    image: phuongndam/comfyuiworker:v1.0.4
     pull_policy: never
     deploy:
       resources:
@@ -19,6 +19,6 @@ services:
     # command: >
     #   /bin/bash -c "/app-dev-test/start_dev.sh"
 
-    # command: tail -f /dev/null
+    command: tail -f /dev/null
     # command: >
     #   /bin/bash -c "/workspace/.venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch"
