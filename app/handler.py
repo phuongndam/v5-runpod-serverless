@@ -55,9 +55,10 @@ class HealthChecker:
                 "consecutive_failures": self.consecutive_failures
             }
         
-        # Check ComfyUI HTTP endpoint
+        # Check ComfyUI HTTP endpoint with longer timeout for startup
         try:
-            response = requests.get(f"http://127.0.0.1:8188/", timeout=5)
+            # Give ComfyUI more time to start up (30 seconds)
+            response = requests.get(f"http://127.0.0.1:8188/", timeout=30)
             if response.status_code != 200:
                 self.consecutive_failures += 1
                 return {
@@ -66,6 +67,14 @@ class HealthChecker:
                     "consecutive_failures": self.consecutive_failures
                 }
         except Exception as e:
+            # Don't count startup time as failure
+            if "ComfyUI startup time" in str(e) or "Connection refused" in str(e):
+                return {
+                    "status": "starting",
+                    "message": "ComfyUI is starting up",
+                    "consecutive_failures": 0
+                }
+            
             self.consecutive_failures += 1
             return {
                 "status": "error",
@@ -258,92 +267,36 @@ async def startup_event():
     health_thread = threading.Thread(target=health_monitor_loop, daemon=True)
     health_thread.start()
     
-    # Register with load balancer
-    await register_with_load_balancer()
+    # Load balancer registration removed - not needed for simple monitoring
     
     logger.info("ComfyUI Supervisor started successfully")
 
-async def register_with_load_balancer():
-    """Register this worker with the load balancer"""
-    try:
-        load_balancer_url = os.getenv("LOAD_BALANCER_URL", "http://localhost:8000")
-        response = requests.post(
-            f"{load_balancer_url}/register_worker",
-            params={"worker_id": worker_id, "status": "healthy"},
-            timeout=10
-        )
-        if response.status_code == 200:
-            logger.info(f"Successfully registered worker {worker_id}")
-        else:
-            logger.warning(f"Failed to register worker: {response.status_code}")
-    except Exception as e:
-        logger.warning(f"Could not register with load balancer: {e}")
 
 def health_monitor_loop():
-    """Background health monitoring loop"""
+    """Background health monitoring loop - simple ComfyUI crash detection"""
     while True:
         try:
             # Perform health check
             health_result = health_checker.check_health()
             
-            # Send heartbeat to load balancer (synchronous version)
-            send_heartbeat_sync(health_result)
-            
-            # Check if restart is needed
-            if health_checker.should_restart():
-                logger.warning("Health check failed, restarting ComfyUI...")
+            # Check if restart is needed (only if status is error, not starting)
+            if health_result.get("status") == "error" and health_checker.should_restart():
+                logger.warning("ComfyUI crashed or failed, restarting...")
                 if manager.restart():
                     logger.info("ComfyUI restarted successfully")
                     health_checker.consecutive_failures = 0  # Reset after successful restart
                 else:
                     logger.error("Failed to restart ComfyUI")
+            elif health_result.get("status") == "starting":
+                logger.info("ComfyUI is starting up, waiting...")
+            elif health_result.get("status") == "healthy":
+                logger.debug("ComfyUI is running normally")
                     
         except Exception as e:
             logger.error(f"Health monitor error: {e}")
         
-        time.sleep(5)  # Check every 5 seconds
+        time.sleep(10)  # Check every 10 seconds (less frequent)
 
-def send_heartbeat_sync(health_result):
-    """Send heartbeat to load balancer (synchronous version)"""
-    try:
-        load_balancer_url = os.getenv("LOAD_BALANCER_URL", "http://localhost:8000")
-        cpu_usage = psutil.cpu_percent()
-        
-        response = requests.post(
-            f"{load_balancer_url}/worker_heartbeat",
-            params={
-                "worker_id": worker_id,
-                "cpu_usage": cpu_usage
-            },
-            timeout=5
-        )
-        
-        if response.status_code != 200:
-            logger.warning(f"Heartbeat failed: {response.status_code}")
-            
-    except Exception as e:
-        logger.warning(f"Could not send heartbeat: {e}")
-
-async def send_heartbeat(health_result):
-    """Send heartbeat to load balancer (async version)"""
-    try:
-        load_balancer_url = os.getenv("LOAD_BALANCER_URL", "http://localhost:8000")
-        cpu_usage = psutil.cpu_percent()
-        
-        response = requests.post(
-            f"{load_balancer_url}/worker_heartbeat",
-            params={
-                "worker_id": worker_id,
-                "cpu_usage": cpu_usage
-            },
-            timeout=5
-        )
-        
-        if response.status_code != 200:
-            logger.warning(f"Heartbeat failed: {response.status_code}")
-            
-    except Exception as e:
-        logger.warning(f"Could not send heartbeat: {e}")
 
 @app.get("/health", response_model=HealthResponse)
 async def get_health():
@@ -412,6 +365,7 @@ async def get_metrics():
         "worker_id": worker_id,
         "timestamp": datetime.now().isoformat()
     }
+
 
 @app.post("/process_workflow")
 async def process_workflow(request: dict):
