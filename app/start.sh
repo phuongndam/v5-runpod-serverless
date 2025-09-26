@@ -2,6 +2,12 @@
 set -e
 
 # ----------------------------
+# Environment setup
+# ----------------------------
+export PYTHONUNBUFFERED=1
+export WORKER_ID="worker_$(hostname)_$$"
+
+# ----------------------------
 # Memory optimization with tcmalloc
 # ----------------------------
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1 || true)"
@@ -13,39 +19,69 @@ else
 fi
 
 # ----------------------------
-# Force ComfyUI Manager to offline mode
+# Force ComfyUI Manager to offline mode (if available)
 # ----------------------------
-comfy-manager-set-mode offline || \
-  echo "worker-comfyui: Could not set ComfyUI-Manager network_mode" >&2
+if command -v comfy-manager-set-mode >/dev/null 2>&1; then
+    comfy-manager-set-mode offline || \
+      echo "worker-comfyui: Could not set ComfyUI-Manager network_mode" >&2
+else
+    echo "worker-comfyui: comfy-manager-set-mode not found, skipping..."
+fi
 
 # ----------------------------
-# Default log level = DEBUG
+# Default log level
 # ----------------------------
 : "${COMFY_LOG_LEVEL:=INFO}"
 
 # ----------------------------
-# Start ComfyUI (background)
+# Check if running in load balancer mode
 # ----------------------------
-echo "worker-comfyui: Starting ComfyUI..."
-/environment-comfyui/venv/bin/python /ComfyUI/main.py \
-    --listen 0.0.0.0 \
-    --port 8188 \
-    --disable-metadata \
-    --disable-auto-launch \
-    --verbose "${COMFY_LOG_LEVEL}" \
-    --log-stdout &
-
-COMFYUI_PID=$!
-echo "worker-comfyui: ComfyUI started with PID $COMFYUI_PID"
+if [ "${LOAD_BALANCER_MODE:-false}" = "true" ]; then
+    echo "Starting in Load Balancer mode..."
+    python -u /app/app.py
+    exit 0
+fi
 
 # ----------------------------
-# Start handler (supervisor for ComfyUI)
+# Start ComfyUI Supervisor (includes ComfyUI management)
 # ----------------------------
-echo "Starting ComfyUI Supervisor ..."
-python -u /app/handler.py
+echo "Starting ComfyUI Supervisor with auto-restart monitoring..."
+python -u /app/handler.py &
+
+SUPERVISOR_PID=$!
+echo "ComfyUI Supervisor started with PID $SUPERVISOR_PID"
+
+# Wait for supervisor to be ready
+echo "Waiting for ComfyUI Supervisor to be ready..."
+for i in {1..30}; do
+    if curl -s http://localhost:8000/health > /dev/null 2>&1; then
+        echo "ComfyUI Supervisor is ready!"
+        break
+    fi
+    echo "Waiting for supervisor... ($i/30)"
+    sleep 2
+done
 
 # ----------------------------
 # Start RunPod handler (main job dispatcher)
 # ----------------------------
-echo "Starting RunPod API handler ..."
-python -u /app/runpod_handler.py
+echo "Starting RunPod API handler..."
+python -u /app/rp_handler.py &
+
+RUNPOD_PID=$!
+echo "RunPod handler started with PID $RUNPOD_PID"
+
+# ----------------------------
+# Wait for processes and handle cleanup
+# ----------------------------
+cleanup() {
+    echo "Shutting down..."
+    kill $SUPERVISOR_PID $RUNPOD_PID 2>/dev/null || true
+    wait
+    echo "Shutdown complete"
+}
+
+trap cleanup SIGTERM SIGINT
+
+# Wait for any process to exit
+wait

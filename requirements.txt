@@ -3,3 +3,5 @@ websocket-client
 requests
 fastapi
 uvicorn
+pydantic
+psutil

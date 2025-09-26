@@ -56,7 +56,7 @@ WORKDIR /
 RUN git clone https://github.com/comfyanonymous/ComfyUI
 
 # copy custom nodes to ComfyUI directory in Docker container
-COPY ComfyUI/custom_nodes/ /ComfyUI/custom_nodes
+COPY ./custom_nodes/ /ComfyUI/custom_nodes
 
 # copy extra model paths to ComfyUI directory in Docker container
 COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
@@ -71,5 +71,8 @@ RUN mkdir -p /environment-comfyui/venv \
     && tar -xzf /tmp/venv.tar.gz -C /environment-comfyui/venv \
     && rm /tmp/venv.tar.gz \
     && chmod -R 755 /environment-comfyui/venv
+
+# Expose ports
+EXPOSE 8188 8000
 
 CMD ["app/start.sh"]

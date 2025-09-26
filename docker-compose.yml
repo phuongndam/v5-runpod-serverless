@@ -1,6 +1,6 @@
 services:
   comfyui-worker:
-    image: phuongndam/comfyuiworker:v1.0.0
+    image: phuongndam/comfyuiworker:v1.0.3
     pull_policy: never
     deploy:
       resources:
