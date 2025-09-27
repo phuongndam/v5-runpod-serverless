@@ -1,6 +1,6 @@
 services:
   comfyui-worker:
-    image: phuongndam/comfyuiworker:v1.0.4
+    image: phuongndam/comfyuiworker:v1.0.6
     pull_policy: never
     deploy:
       resources:
@@ -13,12 +13,13 @@ services:
       - "8188:8188"
       - "8000:8000"
       - "8001:8001"
+      - "8002:8002"
     volumes:
       - ./models-mapping:/runpod-volume
 
     # command: >
     #   /bin/bash -c "/app-dev-test/start_dev.sh"
 
-    command: tail -f /dev/null
+    # command: tail -f /dev/null
     # command: >
     #   /bin/bash -c "/workspace/.venv/bin/python /workspace/ComfyUI/main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch"

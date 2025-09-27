@@ -57,6 +57,7 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI
 
 # copy custom nodes to ComfyUI directory in Docker container
 COPY ./custom_nodes/ /ComfyUI/custom_nodes
+COPY ./test_input.json /test_input.json
 
 # copy extra model paths to ComfyUI directory in Docker container
 COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
@@ -64,6 +65,7 @@ COPY src/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
 RUN chmod -R 755 /app
 RUN chmod -R 755 /workflow-data
 RUN chmod -R 755 /ComfyUI
+RUN chmod -R 755 /test_input.json
 
 # Copy và giải nén venv trực tiếp
 COPY venv.tar.gz /tmp/venv.tar.gz
@@ -73,6 +75,6 @@ RUN mkdir -p /environment-comfyui/venv \
     && chmod -R 755 /environment-comfyui/venv
 
 # Expose ports
-EXPOSE 8188 8000
+EXPOSE 8188 8000 8001 8002
 
 CMD ["app/start.sh"]
